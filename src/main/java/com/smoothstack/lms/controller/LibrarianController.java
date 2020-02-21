@@ -140,7 +140,7 @@ public class LibrarianController {
 				return ResponseEntity.badRequest().build();
 			librarianService.addBookCopy(bookCopy);
 			URI uri = UriComponentsBuilder
-					.fromUriString("/librarian/bookcopies/book/{bookId}/librarybranch/{libraryBranchId}")
+					.fromUriString("/librarian/bookcopies/books/{bookId}/librarybranches/{libraryBranchId}")
 					.buildAndExpand(bookCopy.getBook().getId(), bookCopy.getLibraryBranch().getId()).toUri();
 			return ResponseEntity.created(uri).build();
 		} catch (DataIntegrityViolationException e) {

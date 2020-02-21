@@ -10,11 +10,11 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.smoothstack.lms</groupId>
-	<artifactId>librarian-service</artifactId>
+	<artifactId>lms-librarian</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>lms</name>
-	<description>Librarian MicroService</description>
+	<name>lms-librarian</name>
+	<description>Demo project for Spring Boot</description>
 
 	<properties>
 		<java.version>8</java.version>
