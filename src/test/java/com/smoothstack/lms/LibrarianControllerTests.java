@@ -112,18 +112,13 @@ class LibrarianControllerTests {
 		Assertions.assertEquals(HttpStatus.OK, librarianController.getBooks().getStatusCode());
 	}
 
-//	@Test
-//	void addBookCopy() {
-//		BookCopy bookCopy = new BookCopy();
-//		Book book = new Book();
-//		book.setId(6);
-//		bookCopy.setBook(book);
-//		LibraryBranch libraryBranch = new LibraryBranch();
-//		libraryBranch.setId(2);
-//		bookCopy.setLibraryBranch(libraryBranch);
-//		bookCopy.setAmount(777);
-//		Assertions.assertEquals(HttpStatus.CREATED, librarianController.addBookCopy(bookCopy).getStatusCode());
-//	}
+	@Test
+	void addBookCopy() {
+		BookCopy bookCopy = new BookCopy();
+		bookCopy.setId(new BookCopyId(1L, 1L));
+		bookCopy.setAmount(777);
+		Assertions.assertEquals(HttpStatus.CREATED, librarianController.addBookCopy(bookCopy).getStatusCode());
+	}
 
 	@Test
 	void addBookCopyNull() {

@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import com.smoothstack.lms.controller.LibrarianController;
 import com.smoothstack.lms.entity.Book;
@@ -26,10 +27,13 @@ import com.smoothstack.lms.service.LibrarianService;
 public class LibrarianServiceTests {
 
 	@InjectMocks
-	LibrarianController librarianController;
+	private LibrarianController librarianController;
 
 	@Mock
-	LibrarianService librarianService;
+	private LibrarianService librarianService;
+
+	@Mock
+	private LocalValidatorFactoryBean validator;
 
 	@Test
 	public void getLibraryBranches() throws SQLException {

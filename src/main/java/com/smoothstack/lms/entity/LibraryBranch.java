@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,12 +38,12 @@ public class LibraryBranch {
 	@NotBlank
 	private String address;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "branchId") }, inverseJoinColumns = {
 			@JoinColumn(name = "bookId") })
 	private List<Book> books;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "branchId") }, inverseJoinColumns = {
 			@JoinColumn(name = "cardNo") })
 	private List<Borrower> borrowers;

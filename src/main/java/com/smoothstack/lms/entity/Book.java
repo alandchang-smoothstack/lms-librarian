@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -31,27 +30,27 @@ public class Book {
 	@Column(name = "title")
 	private String title;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne
 	@JoinColumn(name = "pubId")
 	@JsonIgnoreProperties("hibernateLazyInitializer")
 	private Publisher publisher;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_authors", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "authorId") })
 	private List<Author> authors;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_genres", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "genre_id") })
 	private List<Genre> genres;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "branchId") })
 	private List<LibraryBranch> libraryBranches;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "cardNo") })
 	private List<Borrower> borrowers;

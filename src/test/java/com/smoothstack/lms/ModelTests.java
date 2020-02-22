@@ -46,6 +46,15 @@ public class ModelTests {
 	}
 
 	@Test
+	public void bookCopyId() {
+		BookCopyId bookCopyId = new BookCopyId();
+		bookCopyId.setBookId(0L);
+		bookCopyId.setLibraryBranchId(0L);
+		bookCopyId.getBookId();
+		bookCopyId.getLibraryBranchId();
+	}
+
+	@Test
 	public void bookCopy() {
 		BookCopy bookCopy = new BookCopy();
 		bookCopy.setId(new BookCopyId(0L, 0L));
@@ -60,11 +69,13 @@ public class ModelTests {
 		borrower.setName("");
 		borrower.setAddress("");
 		borrower.setPhone("");
+		borrower.setLibraryBranches(new ArrayList<>());
 		borrower.setBooks(new ArrayList<>());
 		borrower.getCardNumber();
 		borrower.getName();
 		borrower.getAddress();
 		borrower.getPhone();
+		borrower.getLibraryBranches();
 		borrower.getBooks();
 	}
 

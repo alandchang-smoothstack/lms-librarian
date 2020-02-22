@@ -4,7 +4,6 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -29,7 +28,7 @@ public class Genre {
 	@Column(name = "genre_name")
 	private String name;
 
-	@ManyToMany(fetch = FetchType.LAZY)
+	@ManyToMany
 	@JoinTable(name = "tbl_book_genres", joinColumns = { @JoinColumn(name = "genre_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "bookId") })
 	private List<Book> books;

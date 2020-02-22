@@ -1,6 +1,5 @@
 package com.smoothstack.lms.controller;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,14 +88,12 @@ public class LibrarianController {
 	@Consumes({ MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<Void> updateLibraryBranch(@RequestBody LibraryBranch libraryBranch) {
 		try {
-			if (libraryBranch == null || !validator.validate(libraryBranch).isEmpty()) {
-				return ResponseEntity.badRequest().build();
-			}
-			boolean isUpdated = librarianService.updateLibraryBranch(libraryBranch);
-			if (!isUpdated) {
+			if (!validator.validate(libraryBranch).isEmpty() || !librarianService.updateLibraryBranch(libraryBranch)) {
 				return ResponseEntity.badRequest().build();
 			}
 			return ResponseEntity.noContent().build();
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -138,15 +135,15 @@ public class LibrarianController {
 	@Consumes({ MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<Void> addBookCopy(@RequestBody BookCopy bookCopy) {
 		try {
-			if (bookCopy == null || !validator.validate(bookCopy).isEmpty()) {
+			if (!validator.validate(bookCopy).isEmpty()) {
 				return ResponseEntity.badRequest().build();
 			}
 			librarianService.addBookCopy(bookCopy);
-			URI uri = UriComponentsBuilder
+			return ResponseEntity.created(UriComponentsBuilder
 					.fromUriString("/librarian/bookcopies/books/{bookId}/librarybranches/{libraryBranchId}")
-					.buildAndExpand(bookCopy.getId().getBookId(), bookCopy.getId().getLibraryBranchId()).toUri();
-			return ResponseEntity.created(uri).build();
-		} catch (DataIntegrityViolationException e) {
+					.buildAndExpand(bookCopy.getId().getBookId(), bookCopy.getId().getLibraryBranchId()).toUri())
+					.build();
+		} catch (IllegalArgumentException | DataIntegrityViolationException e) {
 			return ResponseEntity.badRequest().build();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -158,14 +155,12 @@ public class LibrarianController {
 	@Consumes({ MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
 	public ResponseEntity<Void> updateBookCopy(@RequestBody BookCopy bookCopy) {
 		try {
-			if (bookCopy == null || !validator.validate(bookCopy).isEmpty()) {
-				return ResponseEntity.badRequest().build();
-			}
-			boolean isUpdated = librarianService.updateBookCopy(bookCopy);
-			if (!isUpdated) {
+			if (!validator.validate(bookCopy).isEmpty() || !librarianService.updateBookCopy(bookCopy)) {
 				return ResponseEntity.badRequest().build();
 			}
 			return ResponseEntity.noContent().build();
+		} catch (IllegalArgumentException e) {
+			return ResponseEntity.badRequest().build();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
