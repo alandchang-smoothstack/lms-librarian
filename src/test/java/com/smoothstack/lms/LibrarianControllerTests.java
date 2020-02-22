@@ -179,14 +179,6 @@ class LibrarianControllerTests {
 	}
 
 	@Test
-	void addBookCopyDuplicate() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
 	void getBookCopy() {
 		Assertions.assertEquals(HttpStatus.OK, librarianController.getBookCopy(1, 1).getStatusCode());
 	}

@@ -4,9 +4,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +18,6 @@ import com.smoothstack.lms.entity.LibraryBranch;
 
 @Service
 public class LibrarianService {
-
-	@PersistenceContext
-	EntityManager entityManager;
 
 	@Autowired
 	private LibraryBranchDao libraryBranchDao;
@@ -43,18 +37,12 @@ public class LibrarianService {
 	}
 
 	@Transactional
-	public boolean updateLibraryBranch(LibraryBranch newLibraryBranch) throws SQLException {
-		try {
-			LibraryBranch libraryBranch = entityManager.find(LibraryBranch.class, newLibraryBranch.getId());
-			if (libraryBranch == null) {
-				return false;
-			}
-			libraryBranch.setName(newLibraryBranch.getName());
-			libraryBranch.setAddress(newLibraryBranch.getAddress());
-			return true;
-		} catch (Exception e) {
-			throw e;
+	public boolean updateLibraryBranch(LibraryBranch libraryBranch) throws SQLException {
+		if (!libraryBranchDao.existsById(libraryBranch.getId())) {
+			return false;
 		}
+		libraryBranchDao.save(libraryBranch);
+		return true;
 	}
 
 	public List<Book> getBooks() throws SQLException {
@@ -68,21 +56,19 @@ public class LibrarianService {
 	@Transactional
 	public void addBookCopy(BookCopy bookCopy) throws SQLException {
 		try {
-			entityManager.persist(bookCopy);
+			bookCopyDao.save(bookCopy);
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 
 	@Transactional
-	public boolean updateBookCopy(BookCopy newBookCopy) throws SQLException {
+	public boolean updateBookCopy(BookCopy bookCopy) throws SQLException {
 		try {
-			BookCopy bookCopy = entityManager.find(BookCopy.class,
-					new BookCopyId(newBookCopy.getId().getBookId(), newBookCopy.getId().getLibraryBranchId()));
-			if (bookCopy == null) {
+			if (!bookCopyDao.existsById(bookCopy.getId())) {
 				return false;
 			}
-			bookCopy.setAmount(newBookCopy.getAmount());
+			bookCopyDao.save(bookCopy);
 			return true;
 		} catch (Exception e) {
 			throw e;
