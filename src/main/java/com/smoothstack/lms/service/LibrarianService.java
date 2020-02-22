@@ -55,24 +55,16 @@ public class LibrarianService {
 
 	@Transactional
 	public void addBookCopy(BookCopy bookCopy) throws SQLException {
-		try {
-			bookCopyDao.save(bookCopy);
-		} catch (Exception e) {
-			throw e;
-		}
+		bookCopyDao.save(bookCopy);
 	}
 
 	@Transactional
 	public boolean updateBookCopy(BookCopy bookCopy) throws SQLException {
-		try {
-			if (!bookCopyDao.existsById(bookCopy.getId())) {
-				return false;
-			}
-			bookCopyDao.save(bookCopy);
-			return true;
-		} catch (Exception e) {
-			throw e;
+		if (!bookCopyDao.existsById(bookCopy.getId())) {
+			return false;
 		}
+		bookCopyDao.save(bookCopy);
+		return true;
 	}
 
 }
