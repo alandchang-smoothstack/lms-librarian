@@ -5,8 +5,12 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 @Entity
 @Table(name = "tbl_book_copies")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class BookCopy {
 
 	@EmbeddedId
@@ -14,10 +18,6 @@ public class BookCopy {
 
 	@Column(name = "noOfCopies")
 	private Integer amount;
-	
-	public BookCopy() {
-		
-	}
 
 	public BookCopyId getId() {
 		return id;

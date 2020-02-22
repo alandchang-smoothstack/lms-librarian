@@ -14,11 +14,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "tbl_book")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Book {
 
 	@Id
@@ -31,37 +32,27 @@ public class Book {
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "pubId")
-	@JsonManagedReference(value = "book_publisher")
-	@JsonIgnoreProperties("hibernateLazyInitializer")
 	private Publisher publisher;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_authors", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "authorId") })
-	@JsonManagedReference(value = "book_author")
 	private List<Author> authors;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_genres", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "genre_id") })
-	@JsonManagedReference(value = "book_genre")
 	private List<Genre> genres;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "branchId") })
-	@JsonManagedReference(value = "book_library_branch")
 	private List<LibraryBranch> libraryBranches;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "bookId") }, inverseJoinColumns = {
 			@JoinColumn(name = "cardNo") })
-	@JsonManagedReference(value = "book_borrower")
 	private List<Borrower> borrowers;
-
-	public Book() {
-
-	}
 
 	public Long getId() {
 		return id;

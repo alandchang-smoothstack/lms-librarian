@@ -13,10 +13,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "tbl_genre")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Genre {
 
 	@Id
@@ -30,13 +32,8 @@ public class Genre {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_genres", joinColumns = { @JoinColumn(name = "genre_id") }, inverseJoinColumns = {
 			@JoinColumn(name = "bookId") })
-	@JsonBackReference(value = "book_genre")
 	private List<Book> books;
 
-	public Genre() {
-		
-	}
-	
 	public Long getId() {
 		return id;
 	}

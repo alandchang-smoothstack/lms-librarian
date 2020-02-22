@@ -10,10 +10,12 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "tbl_publisher")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Publisher {
 
 	@Id
@@ -31,12 +33,7 @@ public class Publisher {
 	private String phone;
 
 	@OneToMany(mappedBy = "publisher")
-	@JsonBackReference(value = "book_publisher")
 	private List<Book> books;
-
-	public Publisher() {
-
-	}
 
 	public Long getId() {
 		return id;

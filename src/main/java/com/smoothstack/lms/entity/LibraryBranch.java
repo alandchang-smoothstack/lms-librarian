@@ -13,11 +13,12 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 @Entity
 @Table(name = "tbl_library_branch")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class LibraryBranch {
 
 	@Id
@@ -34,18 +35,12 @@ public class LibraryBranch {
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "branchId") }, inverseJoinColumns = {
 			@JoinColumn(name = "bookId") })
-	@JsonBackReference(value = "book_library_branch")
 	private List<Book> books;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "tbl_book_loans", joinColumns = { @JoinColumn(name = "branchId") }, inverseJoinColumns = {
 			@JoinColumn(name = "cardNo") })
-	@JsonManagedReference(value = "library_branch_borrower")
 	private List<Borrower> borrowers;
-
-	public LibraryBranch() {
-
-	}
 
 	public Long getId() {
 		return id;
