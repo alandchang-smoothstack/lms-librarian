@@ -1,11 +1,9 @@
 package com.smoothstack.lms.controller;
 
 import java.net.URI;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 
-import javax.validation.Valid;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
@@ -13,9 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.env.Environment;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,6 +35,9 @@ public class LibrarianController {
 
 	@Autowired
 	private LibrarianService librarianService;
+
+	@Autowired
+	private LocalValidatorFactoryBean validator;
 
 	@Autowired
 	private DiscoveryClient discoveryClient;
@@ -77,27 +80,25 @@ public class LibrarianController {
 			}
 			return ResponseEntity.ok(libraryBranch);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
 	@PutMapping(path = "/librarian/librarybranches")
 	@Consumes({ MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public ResponseEntity<Void> updateLibraryBranch(@Valid @RequestBody LibraryBranch libraryBranch) {
+	public ResponseEntity<Void> updateLibraryBranch(@RequestBody LibraryBranch libraryBranch) {
 		try {
-			if (libraryBranch == null || libraryBranch.getId() == null || libraryBranch.getName() == null
-					|| libraryBranch.getAddress() == null)
+			if (libraryBranch == null || !validator.validate(libraryBranch).isEmpty()) {
 				return ResponseEntity.badRequest().build();
-			if (libraryBranch.getName().trim().isEmpty())
-				return ResponseEntity.badRequest().build();
-			if (libraryBranch.getAddress().trim().isEmpty())
-				return ResponseEntity.badRequest().build();
+			}
 			boolean isUpdated = librarianService.updateLibraryBranch(libraryBranch);
 			if (!isUpdated) {
 				return ResponseEntity.badRequest().build();
 			}
 			return ResponseEntity.noContent().build();
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -112,6 +113,7 @@ public class LibrarianController {
 			}
 			return ResponseEntity.ok(books);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
@@ -127,27 +129,24 @@ public class LibrarianController {
 			}
 			return ResponseEntity.ok(bookCopy);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 		}
 	}
 
 	@PostMapping(path = "/librarian/bookcopies")
 	@Consumes({ MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public ResponseEntity<Void> addBookCopy(@Valid @RequestBody BookCopy bookCopy) {
+	public ResponseEntity<Void> addBookCopy(@RequestBody BookCopy bookCopy) {
 		try {
-			if (bookCopy == null || bookCopy.getId() == null || bookCopy.getId().getBookId() == null
-					|| bookCopy.getId().getLibraryBranchId() == null || bookCopy.getAmount() == null
-					|| bookCopy.getAmount() < 0)
-				return ResponseEntity.badRequest().build();
-			boolean isSaved = librarianService.addBookCopy(bookCopy);
-			if (!isSaved) {
+			if (bookCopy == null || !validator.validate(bookCopy).isEmpty()) {
 				return ResponseEntity.badRequest().build();
 			}
+			librarianService.addBookCopy(bookCopy);
 			URI uri = UriComponentsBuilder
 					.fromUriString("/librarian/bookcopies/books/{bookId}/librarybranches/{libraryBranchId}")
 					.buildAndExpand(bookCopy.getId().getBookId(), bookCopy.getId().getLibraryBranchId()).toUri();
 			return ResponseEntity.created(uri).build();
-		} catch (SQLIntegrityConstraintViolationException e) {
+		} catch (DataIntegrityViolationException e) {
 			return ResponseEntity.badRequest().build();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -157,12 +156,11 @@ public class LibrarianController {
 
 	@PutMapping(path = "/librarian/bookcopies")
 	@Consumes({ MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE })
-	public ResponseEntity<Void> updateBookCopy(@Valid @RequestBody BookCopy bookCopy) {
+	public ResponseEntity<Void> updateBookCopy(@RequestBody BookCopy bookCopy) {
 		try {
-			if (bookCopy == null || bookCopy.getId() == null || bookCopy.getId().getBookId() == null
-					|| bookCopy.getId().getLibraryBranchId() == null || bookCopy.getAmount() == null
-					|| bookCopy.getAmount() < 0)
+			if (bookCopy == null || !validator.validate(bookCopy).isEmpty()) {
 				return ResponseEntity.badRequest().build();
+			}
 			boolean isUpdated = librarianService.updateBookCopy(bookCopy);
 			if (!isUpdated) {
 				return ResponseEntity.badRequest().build();

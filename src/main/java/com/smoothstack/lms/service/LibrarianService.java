@@ -66,14 +66,9 @@ public class LibrarianService {
 	}
 
 	@Transactional
-	public boolean addBookCopy(BookCopy bookCopy) throws SQLException {
+	public void addBookCopy(BookCopy bookCopy) throws SQLException {
 		try {
-			if (entityManager.find(BookCopy.class,
-					new BookCopyId(bookCopy.getId().getBookId(), bookCopy.getId().getLibraryBranchId())) != null) {
-				return false;
-			}
 			entityManager.persist(bookCopy);
-			return true;
 		} catch (Exception e) {
 			throw e;
 		}

@@ -12,6 +12,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -24,12 +26,17 @@ public class LibraryBranch {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "branchId")
+	@NotNull
 	private Long id;
 
 	@Column(name = "branchName")
+	@NotNull
+	@NotBlank
 	private String name;
 
 	@Column(name = "branchAddress")
+	@NotNull
+	@NotBlank
 	private String address;
 
 	@ManyToMany(fetch = FetchType.LAZY)
