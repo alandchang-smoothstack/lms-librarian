@@ -2,25 +2,28 @@ package com.smoothstack.lms.service;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.smoothstack.lms.dao.BookCopyDao;
 import com.smoothstack.lms.dao.BookDao;
 import com.smoothstack.lms.dao.LibraryBranchDao;
-import com.smoothstack.lms.model.Book;
-import com.smoothstack.lms.model.BookCopy;
-import com.smoothstack.lms.model.LibraryBranch;
+import com.smoothstack.lms.entity.Book;
+import com.smoothstack.lms.entity.BookCopy;
+import com.smoothstack.lms.entity.BookCopyId;
+import com.smoothstack.lms.entity.LibraryBranch;
 
 @Service
 public class LibrarianService {
 
-	@Autowired
-	private PlatformTransactionManager platformTransactionManager;
+	@PersistenceContext
+	EntityManager entityManager;
 
 	@Autowired
 	private LibraryBranchDao libraryBranchDao;
@@ -32,55 +35,61 @@ public class LibrarianService {
 	private BookCopyDao bookCopyDao;
 
 	public List<LibraryBranch> getLibraryBranches() throws SQLException {
-		return libraryBranchDao.read();
+		return libraryBranchDao.findAll();
 	}
 
-	public LibraryBranch getLibraryBranchById(int id) throws SQLException {
-		return libraryBranchDao.readOne(id);
+	public Optional<LibraryBranch> getLibraryBranchById(long id) throws SQLException {
+		return libraryBranchDao.findById(id);
 	}
 
-	public int updateLibraryBranch(LibraryBranch libraryBranch) throws SQLException {
-		DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
-		TransactionStatus status = platformTransactionManager.getTransaction(defaultTransactionDefinition);
+	@Transactional
+	public boolean updateLibraryBranch(LibraryBranch newLibraryBranch) throws SQLException {
 		try {
-			int rowsAffected = libraryBranchDao.update(libraryBranch);
-			platformTransactionManager.commit(status);
-			return rowsAffected;
+			LibraryBranch libraryBranch = entityManager.find(LibraryBranch.class, newLibraryBranch.getId());
+			if (libraryBranch == null) {
+				return false;
+			}
+			libraryBranch.setName(newLibraryBranch.getName());
+			libraryBranch.setAddress(newLibraryBranch.getAddress());
+			return true;
 		} catch (Exception e) {
-			platformTransactionManager.rollback(status);
 			throw e;
 		}
 	}
 
 	public List<Book> getBooks() throws SQLException {
-		return bookDao.read();
+		return bookDao.findAll();
 	}
 
-	public BookCopy getBookCopyById(int bookId, int libraryBranchId) throws SQLException {
-		return bookCopyDao.readOne(bookId, libraryBranchId);
+	public Optional<BookCopy> getBookCopyById(long bookId, long libraryBranchId) throws SQLException {
+		return bookCopyDao.findById(new BookCopyId(bookId, libraryBranchId));
 	}
 
-	public void addBookCopy(BookCopy bookCopy) throws SQLException {
-		DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
-		TransactionStatus status = platformTransactionManager.getTransaction(defaultTransactionDefinition);
+	@Transactional
+	public boolean addBookCopy(BookCopy bookCopy) throws SQLException {
 		try {
-			bookCopyDao.create(bookCopy);
-			platformTransactionManager.commit(status);
+			if (entityManager.find(BookCopy.class,
+					new BookCopyId(bookCopy.getId().getBookId(), bookCopy.getId().getLibraryBranchId())) != null) {
+				return false;
+			}
+			entityManager.persist(bookCopy);
+			return true;
 		} catch (Exception e) {
-			platformTransactionManager.rollback(status);
 			throw e;
 		}
 	}
 
-	public int updateBookCopy(BookCopy bookCopy) throws SQLException {
-		DefaultTransactionDefinition defaultTransactionDefinition = new DefaultTransactionDefinition();
-		TransactionStatus status = platformTransactionManager.getTransaction(defaultTransactionDefinition);
+	@Transactional
+	public boolean updateBookCopy(BookCopy newBookCopy) throws SQLException {
 		try {
-			int rowsAffected = bookCopyDao.update(bookCopy);
-			platformTransactionManager.commit(status);
-			return rowsAffected;
+			BookCopy bookCopy = entityManager.find(BookCopy.class,
+					new BookCopyId(newBookCopy.getId().getBookId(), newBookCopy.getId().getLibraryBranchId()));
+			if (bookCopy == null) {
+				return false;
+			}
+			bookCopy.setAmount(newBookCopy.getAmount());
+			return true;
 		} catch (Exception e) {
-			platformTransactionManager.rollback(status);
 			throw e;
 		}
 	}
