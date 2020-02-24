@@ -1,6 +1,5 @@
 package com.smoothstack.lms.service;
 
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,16 +27,16 @@ public class LibrarianService {
 	@Autowired
 	private BookCopyDao bookCopyDao;
 
-	public List<LibraryBranch> getLibraryBranches() throws SQLException {
+	public List<LibraryBranch> getLibraryBranches() throws Exception {
 		return libraryBranchDao.findAll();
 	}
 
-	public Optional<LibraryBranch> getLibraryBranchById(long id) throws SQLException {
+	public Optional<LibraryBranch> getLibraryBranchById(long id) throws Exception {
 		return libraryBranchDao.findById(id);
 	}
 
 	@Transactional
-	public boolean updateLibraryBranch(LibraryBranch libraryBranch) throws SQLException {
+	public boolean updateLibraryBranch(LibraryBranch libraryBranch) throws Exception {
 		if (!libraryBranchDao.existsById(libraryBranch.getId())) {
 			return false;
 		}
@@ -45,21 +44,21 @@ public class LibrarianService {
 		return true;
 	}
 
-	public List<Book> getBooks() throws SQLException {
+	public List<Book> getBooks() throws Exception {
 		return bookDao.findAll();
 	}
 
-	public Optional<BookCopy> getBookCopyById(long bookId, long libraryBranchId) throws SQLException {
+	public Optional<BookCopy> getBookCopyById(long bookId, long libraryBranchId) throws Exception {
 		return bookCopyDao.findById(new BookCopyId(bookId, libraryBranchId));
 	}
 
 	@Transactional
-	public void addBookCopy(BookCopy bookCopy) throws SQLException {
+	public void addBookCopy(BookCopy bookCopy) throws Exception {
 		bookCopyDao.save(bookCopy);
 	}
 
 	@Transactional
-	public boolean updateBookCopy(BookCopy bookCopy) throws SQLException {
+	public boolean updateBookCopy(BookCopy bookCopy) throws Exception {
 		if (!bookCopyDao.existsById(bookCopy.getId())) {
 			return false;
 		}

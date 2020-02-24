@@ -36,27 +36,27 @@ public class LibrarianServiceTests {
 	private LocalValidatorFactoryBean validator;
 
 	@Test
-	public void getLibraryBranches() throws SQLException {
+	public void getLibraryBranches() throws Exception {
 		when(librarianService.getLibraryBranches()).thenThrow(SQLException.class);
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,
 				librarianController.getLibraryBranches().getStatusCode());
 	}
 
 	@Test
-	public void getLibraryBranchesEmpty() throws SQLException {
+	public void getLibraryBranchesEmpty() throws Exception {
 		when(librarianService.getLibraryBranches()).thenReturn(new ArrayList<LibraryBranch>());
 		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getLibraryBranches().getStatusCode());
 	}
 
 	@Test
-	public void getLibraryBranchById() throws SQLException {
+	public void getLibraryBranchById() throws Exception {
 		when(librarianService.getLibraryBranchById(anyLong())).thenThrow(SQLException.class);
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,
 				librarianController.getLibraryBranchById(1L).getStatusCode());
 	}
 
 	@Test
-	public void updateLibraryBranch() throws SQLException {
+	public void updateLibraryBranch() throws Exception {
 		LibraryBranch libraryBranch = new LibraryBranch();
 		libraryBranch.setId(1L);
 		libraryBranch.setName("TestName");
@@ -67,19 +67,19 @@ public class LibrarianServiceTests {
 	}
 
 	@Test
-	public void getBooks() throws SQLException {
+	public void getBooks() throws Exception {
 		when(librarianService.getBooks()).thenThrow(SQLException.class);
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, librarianController.getBooks().getStatusCode());
 	}
 
 	@Test
-	public void getBooksEmpty() throws SQLException {
+	public void getBooksEmpty() throws Exception {
 		when(librarianService.getBooks()).thenReturn(new ArrayList<Book>());
 		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getBooks().getStatusCode());
 	}
 
 	@Test
-	public void addBookCopy() throws SQLException {
+	public void addBookCopy() throws Exception {
 		BookCopy bookCopy = new BookCopy();
 		bookCopy.setId(new BookCopyId(1L, 1L));
 		bookCopy.setAmount(1);
@@ -89,14 +89,14 @@ public class LibrarianServiceTests {
 	}
 
 	@Test
-	public void getBookCopyById() throws SQLException {
+	public void getBookCopyById() throws Exception {
 		when(librarianService.getBookCopyById(anyLong(), anyLong())).thenThrow(SQLException.class);
 		Assertions.assertEquals(HttpStatus.INTERNAL_SERVER_ERROR,
 				librarianController.getBookCopy(1, 1).getStatusCode());
 	}
 
 	@Test
-	public void updateBookCopy() throws SQLException {
+	public void updateBookCopy() throws Exception {
 		BookCopy bookCopy = new BookCopy();
 		bookCopy.setId(new BookCopyId(1L, 1L));
 		bookCopy.setAmount(1);
