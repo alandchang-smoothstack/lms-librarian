@@ -1,252 +1,165 @@
 package com.smoothstack.lms;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.validation.Validator;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 
 import com.smoothstack.lms.controller.LibrarianController;
-import com.smoothstack.lms.entity.BookCopy;
-import com.smoothstack.lms.entity.BookCopyId;
-import com.smoothstack.lms.entity.LibraryBranch;
+import com.smoothstack.lms.model.Book;
+import com.smoothstack.lms.model.Branch;
+import com.smoothstack.lms.model.Copies;
+import com.smoothstack.lms.service.LibrarianService;
 
 @SpringBootTest
 class LibrarianControllerTests {
 
-	@Autowired
+	@InjectMocks
 	private LibrarianController librarianController;
 
+	@Mock
+	private LibrarianService librarianService;
+
+	@Mock
+	private Validator validator;
+
 	@Test
-	void getLibraryBranches() {
-		Assertions.assertEquals(HttpStatus.OK, librarianController.getLibraryBranches().getStatusCode());
+	void getBranches() {
+		List<Branch> mockList = Mockito.mock(List.class);
+		Mockito.when(mockList.isEmpty()).thenReturn(false);
+		Mockito.when(librarianService.getBranches()).thenReturn(mockList);
+		Assertions.assertEquals(HttpStatus.OK, librarianController.getBranches().getStatusCode());
 	}
 
 	@Test
-	void getLibraryBranchByValidId() {
-		Assertions.assertEquals(HttpStatus.OK, librarianController.getLibraryBranchById(1L).getStatusCode());
+	public void getBranchesEmptyResult() {
+		List<Branch> mockList = Mockito.mock(List.class);
+		Mockito.when(mockList.isEmpty()).thenReturn(true);
+		Mockito.when(librarianService.getBranches()).thenReturn(mockList);
+		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getBranches().getStatusCode());
 	}
 
 	@Test
-	void getLibraryBranchByInvalidId() {
-		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getLibraryBranchById(0L).getStatusCode());
+	void getBranchById() {
+		Optional<Branch> branch = Optional.of(Mockito.mock(Branch.class));
+		Mockito.when(librarianService.getBranchById(Mockito.anyLong())).thenReturn(branch);
+		Assertions.assertEquals(HttpStatus.OK, librarianController.getBranchById(Mockito.anyLong()).getStatusCode());
 	}
 
 	@Test
-	void updateLibraryBranch() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(1L);
-		libraryBranch.setName("TestName");
-		libraryBranch.setAddress("TestAddress");
-		Assertions.assertEquals(HttpStatus.NO_CONTENT,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
+	void getBranchByIdEmptyResult() {
+		Mockito.when(librarianService.getBranchById(Mockito.anyLong())).thenReturn(Optional.empty());
+		Assertions.assertEquals(HttpStatus.NOT_FOUND,
+				librarianController.getBranchById(Mockito.anyLong()).getStatusCode());
 	}
 
 	@Test
-	void updateLibraryBranchNull() {
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateLibraryBranch(null).getStatusCode());
+	void updateBranch() {
+		Branch branch = Mockito.mock(Branch.class);
+		Mockito.when(librarianService.updateBranch(branch)).thenReturn(true);
+		Assertions.assertEquals(HttpStatus.NO_CONTENT, librarianController.updateBranch(branch).getStatusCode());
 	}
 
 	@Test
-	void updateLibraryBranchNullId() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(null);
-		libraryBranch.setName("TestName");
-		libraryBranch.setAddress("TestAddress");
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
+	void updateBranchFailedValidation() {
+		Branch branch = Mockito.mock(Branch.class);
+		Set violations = Mockito.mock(Set.class);
+		Mockito.when(validator.validate(branch)).thenReturn(violations);
+		Mockito.when(violations.isEmpty()).thenReturn(false);
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBranch(branch).getStatusCode());
 	}
 
 	@Test
-	void updateLibraryBranchInvalidId() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(0L);
-		libraryBranch.setName("TestName");
-		libraryBranch.setAddress("TestAddress");
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
-	}
-
-	@Test
-	void updateLibraryBranchNullName() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(1L);
-		libraryBranch.setName(null);
-		libraryBranch.setAddress("TestAddress");
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
-	}
-
-	@Test
-	void updateLibraryBranchEmptyName() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(1L);
-		libraryBranch.setName("");
-		libraryBranch.setAddress("TestAddress");
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
-	}
-
-	@Test
-	void updateLibraryBranchNullAddress() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(1L);
-		libraryBranch.setName("TestName");
-		libraryBranch.setAddress(null);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
-	}
-
-	@Test
-	void updateLibraryBranchEmptyAddress() {
-		LibraryBranch libraryBranch = new LibraryBranch();
-		libraryBranch.setId(1L);
-		libraryBranch.setName("TestName");
-		libraryBranch.setAddress("");
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST,
-				librarianController.updateLibraryBranch(libraryBranch).getStatusCode());
+	void updateBranchFailure() {
+		Branch branch = Mockito.mock(Branch.class);
+		Mockito.when(librarianService.updateBranch(branch)).thenReturn(false);
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBranch(branch).getStatusCode());
 	}
 
 	@Test
 	void getBooks() {
+		List<Book> mockList = Mockito.mock(List.class);
+		Mockito.when(mockList.isEmpty()).thenReturn(false);
+		Mockito.when(librarianService.getBooks()).thenReturn(mockList);
 		Assertions.assertEquals(HttpStatus.OK, librarianController.getBooks().getStatusCode());
 	}
 
 	@Test
-	void addBookCopy() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.CREATED, librarianController.addBookCopy(bookCopy).getStatusCode());
+	public void getBooksEmptyResult() throws Exception {
+		List<Book> mockList = Mockito.mock(List.class);
+		Mockito.when(mockList.isEmpty()).thenReturn(true);
+		Mockito.when(librarianService.getBooks()).thenReturn(mockList);
+		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getBooks().getStatusCode());
 	}
 
 	@Test
-	void addBookCopyNull() {
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(null).getStatusCode());
+	void getCopiesById() {
+		Optional<Copies> copies = Optional.of(Mockito.mock(Copies.class));
+		Mockito.when(librarianService.getCopiesById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(copies);
+		Assertions.assertEquals(HttpStatus.OK,
+				librarianController.getCopiesById(Mockito.anyLong(), Mockito.anyLong()).getStatusCode());
 	}
 
 	@Test
-	void addBookCopyNullBookId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(null, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
+	void getCopiesByIdEmpty() {
+		Mockito.when(librarianService.getCopiesById(Mockito.anyLong(), Mockito.anyLong())).thenReturn(Optional.empty());
+		Assertions.assertEquals(HttpStatus.NOT_FOUND,
+				librarianController.getCopiesById(Mockito.anyLong(), Mockito.anyLong()).getStatusCode());
 	}
 
 	@Test
-	void addBookCopyInvalidBookId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(0L, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
+	void addCopies() {
+		Copies copies = Mockito.mock(Copies.class);
+		Book book = Mockito.mock(Book.class);
+		Branch branch = Mockito.mock(Branch.class);
+		Mockito.when(copies.getBook()).thenReturn(book);
+		Mockito.when(copies.getBranch()).thenReturn(branch);
+		Mockito.when(copies.getBook().getBookId()).thenReturn(1L);
+		Mockito.when(copies.getBranch().getBranchId()).thenReturn(1L);
+		Mockito.when(copies.getCopiesAmount()).thenReturn(1);
+		Mockito.doNothing().when(librarianService).addCopies(copies);
+		Assertions.assertEquals(HttpStatus.CREATED, librarianController.addCopies(copies).getStatusCode());
 	}
 
 	@Test
-	void addBookCopyNullLibraryBranchId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, null));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
+	void addCopiesFailedValidation() {
+		Copies copies = Mockito.mock(Copies.class);
+		Set violations = Mockito.mock(Set.class);
+		Mockito.when(validator.validate(copies)).thenReturn(violations);
+		Mockito.when(violations.isEmpty()).thenReturn(false);
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addCopies(copies).getStatusCode());
 	}
 
 	@Test
-	void addBookCopyInvalidLibraryBranchId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 0L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
+	void updateCopies() {
+		Copies copies = Mockito.mock(Copies.class);
+		Mockito.when(librarianService.updateCopies(copies)).thenReturn(true);
+		Assertions.assertEquals(HttpStatus.NO_CONTENT, librarianController.updateCopies(copies).getStatusCode());
 	}
 
 	@Test
-	void addBookCopyNullAmount() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(null);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
+	void updateCopiesFailedValidation() {
+		Copies copies = Mockito.mock(Copies.class);
+		Set violations = Mockito.mock(Set.class);
+		Mockito.when(validator.validate(copies)).thenReturn(violations);
+		Mockito.when(violations.isEmpty()).thenReturn(false);
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateCopies(copies).getStatusCode());
 	}
 
 	@Test
-	void addBookCopyNegativeAmount() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(-1);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.addBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void getBookCopy() {
-		Assertions.assertEquals(HttpStatus.OK, librarianController.getBookCopy(1, 1).getStatusCode());
-	}
-
-	@Test
-	void getBookCopyInvalidBookId() {
-		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getBookCopy(0, 1).getStatusCode());
-	}
-
-	@Test
-	void getBookCopyInvalidLibraryBranchId() {
-		Assertions.assertEquals(HttpStatus.NOT_FOUND, librarianController.getBookCopy(1, 0).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopy() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.NO_CONTENT, librarianController.updateBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyNull() {
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(null).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyNullBookId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(null, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyInvalidBookId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(0L, 1L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyNullLibraryBranchId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, null));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyInvalidLibraryBranchId() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 0L));
-		bookCopy.setAmount(777);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyNullAmount() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(null);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(bookCopy).getStatusCode());
-	}
-
-	@Test
-	void updateBookCopyNegativeAmount() {
-		BookCopy bookCopy = new BookCopy();
-		bookCopy.setId(new BookCopyId(1L, 1L));
-		bookCopy.setAmount(-1);
-		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateBookCopy(bookCopy).getStatusCode());
+	void updateCopiesFailure() {
+		Copies copies = Mockito.mock(Copies.class);
+		Mockito.when(librarianService.updateCopies(copies)).thenReturn(false);
+		Assertions.assertEquals(HttpStatus.BAD_REQUEST, librarianController.updateCopies(copies).getStatusCode());
 	}
 
 }

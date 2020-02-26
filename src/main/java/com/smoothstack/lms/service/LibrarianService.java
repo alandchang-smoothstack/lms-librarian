@@ -7,62 +7,62 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.smoothstack.lms.dao.BookCopyDao;
 import com.smoothstack.lms.dao.BookDao;
-import com.smoothstack.lms.dao.LibraryBranchDao;
-import com.smoothstack.lms.entity.Book;
-import com.smoothstack.lms.entity.BookCopy;
-import com.smoothstack.lms.entity.BookCopyId;
-import com.smoothstack.lms.entity.LibraryBranch;
+import com.smoothstack.lms.dao.BranchDao;
+import com.smoothstack.lms.dao.CopiesDao;
+import com.smoothstack.lms.model.Book;
+import com.smoothstack.lms.model.BookBranch;
+import com.smoothstack.lms.model.Branch;
+import com.smoothstack.lms.model.Copies;
 
 @Service
 public class LibrarianService {
 
 	@Autowired
-	private LibraryBranchDao libraryBranchDao;
+	private BranchDao libraryBranchDao;
 
 	@Autowired
 	private BookDao bookDao;
 
 	@Autowired
-	private BookCopyDao bookCopyDao;
+	private CopiesDao copiesDao;
 
-	public List<LibraryBranch> getLibraryBranches() throws Exception {
+	public List<Branch> getBranches() {
 		return libraryBranchDao.findAll();
 	}
 
-	public Optional<LibraryBranch> getLibraryBranchById(long id) throws Exception {
+	public Optional<Branch> getBranchById(long id) {
 		return libraryBranchDao.findById(id);
 	}
 
 	@Transactional
-	public boolean updateLibraryBranch(LibraryBranch libraryBranch) throws Exception {
-		if (!libraryBranchDao.existsById(libraryBranch.getId())) {
+	public boolean updateBranch(Branch libraryBranch) {
+		if (!libraryBranchDao.existsById(libraryBranch.getBranchId())) {
 			return false;
 		}
 		libraryBranchDao.save(libraryBranch);
 		return true;
 	}
 
-	public List<Book> getBooks() throws Exception {
+	public List<Book> getBooks() {
 		return bookDao.findAll();
 	}
 
-	public Optional<BookCopy> getBookCopyById(long bookId, long libraryBranchId) throws Exception {
-		return bookCopyDao.findById(new BookCopyId(bookId, libraryBranchId));
+	public Optional<Copies> getCopiesById(long bookId, long branchId) {
+		return copiesDao.findById(new BookBranch(bookId, branchId));
 	}
 
 	@Transactional
-	public void addBookCopy(BookCopy bookCopy) throws Exception {
-		bookCopyDao.save(bookCopy);
+	public void addCopies(Copies copies) {
+		copiesDao.save(copies);
 	}
 
 	@Transactional
-	public boolean updateBookCopy(BookCopy bookCopy) throws Exception {
-		if (!bookCopyDao.existsById(bookCopy.getId())) {
+	public boolean updateCopies(Copies copies) {
+		if (!copiesDao.existsById(new BookBranch(copies.getBook().getBookId(), copies.getBranch().getBranchId()))) {
 			return false;
 		}
-		bookCopyDao.save(bookCopy);
+		copiesDao.save(copies);
 		return true;
 	}
 
