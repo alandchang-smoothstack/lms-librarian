@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.Validator;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.smoothstack.lms.log.LoggerWrapper;
 import com.smoothstack.lms.model.Book;
 import com.smoothstack.lms.model.Branch;
 import com.smoothstack.lms.model.Copies;
@@ -39,8 +41,10 @@ public class LibrarianController {
 	public ResponseEntity<List<Branch>> getBranches() {
 		List<Branch> libraryBranches = librarianService.getBranches();
 		if (libraryBranches.isEmpty()) {
+			LoggerWrapper.log.info("Get library branches: " + Response.Status.NOT_FOUND.getStatusCode());
 			return ResponseEntity.notFound().build();
 		}
+		LoggerWrapper.log.info("getBranches() Status Code: " + Response.Status.OK.getStatusCode());
 		return ResponseEntity.ok(libraryBranches);
 	}
 
